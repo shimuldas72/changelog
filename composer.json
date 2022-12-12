@@ -1,0 +1,19 @@
+{
+    "name": "sdas/changelog",
+    "description": "Log any change in model",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Sdas\\Changelog\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Shimul Das",
+            "email": "shimul.das@deltalife.org"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
