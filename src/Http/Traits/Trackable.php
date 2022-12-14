@@ -7,48 +7,71 @@ trait Trackable
     public static function bootTrackable()
     {
         static::creating(function ($model) {
-            $log = new ChangeLog();
-            $log->action_type = 'create';
-            $log->table_name = $model->getTable();
-            $log->old_value = null;
-            $log->new_value = json_encode($model->getAttributes());
-            $log->save();
+            try{
+                $log = new ChangeLog();
+                $log->action_type = 'create';
+                $log->table_name = $model->getTable();
+                $log->old_value = null;
+                $log->new_value = json_encode($model->getAttributes());
+                $log->save();
+            } catch(\Throwable $t){
+
+            }
         });
 
         static::updating(function ($model) {
-            $changed_values = $model->getDirty();
-            $original_values = $model->getOriginal();
+            try{
+                $changed_values = $model->getDirty();
+                $original_values = $model->getOriginal();
 
-            $log = new ChangeLog();
-            $log->action_type = 'update';
-            $log->table_name = $model->getTable();
-            $log->old_value = json_encode($model->getPreviousValues($original_values, $changed_values));
-            $log->new_value = json_encode($changed_values);
-            $log->save();
+                $compared_values = $model->getChangedValues($original_values, $changed_values);
+
+                $log = new ChangeLog();
+                $log->action_type = 'update';
+                $log->table_name = $model->getTable();
+                $log->old_value = json_encode($compared_values['old']);
+                $log->new_value = json_encode($compared_values['new']);
+                $log->save();
+            } catch(\Throwable $t){
+
+            }
         });
 
         static::deleting(function ($model) {
-            $log = new ChangeLog();
-            $log->action_type = 'delete';
-            $log->table_name = $model->getTable();
-            $log->old_value = json_encode($model->getAttributes());
-            $log->new_value = null;
-            $log->save();
+            try{
+                $log = new ChangeLog();
+                $log->action_type = 'delete';
+                $log->table_name = $model->getTable();
+                $log->old_value = json_encode($model->getAttributes());
+                $log->new_value = null;
+                $log->save();
+            } catch(\Throwable $t){
+
+            }
         });
     }
 
-    public function getPreviousValues($original_values, $changed_values)
+    public function getChangedValues($original_values, $changed_values)
     {
-        $sortedChanges = [];
+        $old = [];
+        $new = [];
 
         if(count($changed_values) > 0) {
             foreach ($changed_values as $key => $value) {
                 if(isset($original_values[$key])) {
-                    $sortedChanges[$key] = $original_values[$key];
+                    
+                    if($original_values[$key] !== $value) {
+                        $old[$key] = $original_values[$key];
+                        $new[$key] = $changed_values[$key];
+                    }
+
                 }
             }
         }
 
-        return $sortedChanges;
+        return [
+            'old' => $old,
+            'new' => $new
+        ];
     }
 }
