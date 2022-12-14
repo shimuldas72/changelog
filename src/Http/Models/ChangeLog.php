@@ -4,6 +4,7 @@ namespace Sdas\Changelog\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use App\User;
 
 class ChangeLog extends Model
@@ -38,7 +39,7 @@ class ChangeLog extends Model
 		return (array)json_decode($value);
 	}
   public function user() {
-      return $this->hasOne(User::class, 'id', 'created_by');
+      return $this->hasOne(Config::get('changelog')['userClass'], 'id', 'created_by');
   }
 
   public function getResponseForDatatable($draw,$recordsTotal,$recordFiltered,$data){
@@ -105,6 +106,7 @@ class ChangeLog extends Model
   public function getDatatableData($items, $data = array()) {
       try {
           foreach ($items as $key => $item) {
+            $user_name_column = Config::get('changelog')['name_column'];
 
             $old_values = \Illuminate\Support\Facades\View::make('changelog::changelog._old_value', [ 'item' => $item ])->render();
             //$old_values = $view->render();
@@ -117,7 +119,7 @@ class ChangeLog extends Model
             $nestedData['table_name'] = $item->table_name;
             $nestedData['old_value'] = $old_values;
             $nestedData['new_value'] = $new_values;
-            $nestedData['created_by'] = ($item->user)?$item->user->name.' ('.$item->created_by.')':$item->created_by;
+            $nestedData['created_by'] = ($item->user)?$item->user->$user_name_column.' ('.$item->created_by.')':$item->created_by;
             $nestedData['created_at'] = date('d-M-y h:i:s A', strtotime($item->created_at));
 
             $nestedData['action'] = '';
