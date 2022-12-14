@@ -11,6 +11,11 @@ After installing the package publish the config file
 
 Published config file will be found in the config folder of your laravel project. Update the config variables according to your project structure.
 
+Publish and migrate the migrations
+
+    $ php artisan vendor:publish --tag=changelog-migrations
+    $ php artisan migrate
+
 Now, run the command below to refresh all the cache
 
     $ php artisan optimize
