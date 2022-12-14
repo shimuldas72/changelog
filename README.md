@@ -1,7 +1,7 @@
 ## About Changelog package
 This package is responsible for logging create, update and delete event in a table and gives the admin a view of what is happening in this system. 
 
-Installtaion:
+Installation:
 
     $ composer require sdas/changelog
     
@@ -15,7 +15,7 @@ Now, run the command below to refresh all the cache
 
     $ php artisan optimize
     
-Great, installation is done.
+Great, installation process is done.
 
 Now use <b>Sdas\Changelog\Http\Traits\Trackable</b> trait in any class that extends <b>Illuminate\Database\Eloquent\Model</b> like this
 
