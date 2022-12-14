@@ -3,29 +3,63 @@ namespace Sdas\Changelog\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Sdas\Changelog\Http\Models\ChangeLog;
+use Illuminate\Http\Request;
 
 class ChangeLogController extends Controller
 {
+    public $changeLog;
+     public function __construct(){
+        $this->changeLog = new ChangeLog;
+    }
+
     public function index() {
-        $data = new ChangeLog();
-        if(isset($_GET['term']) && $_GET['term'] != '') {
-            $term = $_GET['term'];
-            $data = $data->where(function($query) use ($term) {
-                $query->orWhere('action_type', 'like', '%'.$term.'%');
-                $query->orWhere('table_name', 'like', '%'.$term.'%');
-                $query->orWhere('old_value', 'like', '%'.$term.'%');
-                $query->orWhere('new_value', 'like', '%'.$term.'%');
-            });
+
+        return view('changelog::changelog.index');
+    }
+
+    public function ajaxList(Request $request) {
+        try{
+            $params = ['filters' => []];
+            $logs = $this->changeLog->getLogList($request, $params);
+            $items = $logs['items'];
+            $data = array();
+
+            if (!empty($items)) {
+                $data = $this->changeLog->getDatatableData($items);
+            }
+
+            return $this->changeLog->getResponseForDatatable(intval($request->input('draw')),intval($logs['totalData']),$logs['totalFiltered'],$data);
+        } catch (\Exception $exception){
+            var_dump($exception->getMessage());
+            exit();
+            return $this->changeLog->getResponseForDatatable(0,0,0,[]);
         }
-        $data = $data->orderBy('id', 'desc')->paginate(5);
+    }
 
-        // $data = ChangeLog::find(1);
-        // echo '<pre>';
-        // var_dump($data->old_value);
-        // exit();
+    public function detail(Request $request, $id) {
+        try{
+            $data = ChangeLog::with('user')->find($id);
 
-        return view('changelog::changelog.index',[
-            'data' => $data
-        ]);
+            $view = \Illuminate\Support\Facades\View::make('changelog::changelog.detail',
+                    [
+                        'item' => $data
+                    ]);
+            $contents = $view->render();
+
+            $response = [
+                'status' => 'success',
+                'data' => $contents
+            ];
+
+            return response()->json($response);
+
+        } catch (\Exception $exception){
+            $response = [
+                'status' => 'error',
+                'data' => $exception->getMessage()
+            ];
+
+            return response()->json($response);
+        }
     }
 }

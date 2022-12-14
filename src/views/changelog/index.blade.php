@@ -2,121 +2,160 @@
 
 @section('content')
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        table.dataTable thead th, table.dataTable thead td{
+            padding: 8px 10px !important
+        }
 
-            <form name="search-form" action="">
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="term">Search Term</label>
-                            <input type="text" name="term" id="term" value="<?= (isset($_GET['term']))?$_GET['term']:''; ?>" class="form-control">
+        table.dataTable th, table.dataTable td { white-space: nowrap; }
+        div.dataTables_wrapper {
+            margin: 0 auto;
+        }
+
+
+    </style>
+
+    <div class="container-fluid">
+        <div class="content-page">
+            <div class="content">
+                <div class="container-fluid">
+                    @if (Session::has('message'))
+                        <div class="col-lg-12">
+                            <div class="alert alert-success" id="DeleteSuccess">
+                                <button type="button" class="close" id="toggle" data-dismiss="modal" aria-hidden="true">×</button>
+                                {{ Session::get('message') }}
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-2">
-                        <label>&nbsp;</label>
-                        <input type="submit" name="submit" value="Search" class="btn btn-block btn-md btn-info">
+                    @endif
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card-box">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h4 class="header-title mb-3 mt-4">All Change Logs </h4>
+                                    </div>
+                                </div>
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-striped table-borderless table-hover brands-campaign-table" id="log-table">
+                                        <thead>
+                                        <tr>
+                                            <th data-sortable="true" class="">ID</th>
+                                            <th data-sortable="true" class="">Action Type</th>
+                                            <th data-sortable="true" class="">Table</th>
+                                            <th data-sortable="true" class="">Old Value</th>
+                                            <th data-sortable="true" class="">New Value</th>
+                                            <th data-sortable="false" class="">Created By</th>
+                                            <th data-sortable="false" class="">Time</th>
+                                            <th data-sortable="false" class=" text-center">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-            </form>
-
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Type</th>
-                            <th>Table</th>
-                            <th>Old Values</th>
-                            <th>New values</th>
-                            <th>Action Performed By</th>
-                            <th>Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        <?php
-                            if($data->count() > 0){
-                                foreach($data as $key => $item) {
-                        ?>
-                                    <tr>
-                                        <td style="vertical-align: middle;">{{ $item->action_type }}</td>
-                                        <td style="vertical-align: middle;">{{ $item->table_name }}</td>
-                                        <td>
-                                            <?php
-                                                if(count($item->old_value) > 0) {
-                                            ?> 
-                                                    <div class="card">
-                                                        <div class="card-body">
-                                                            <table class="table table-borderless mb-0">
-                                                                <?php
-                                                                    foreach($item->old_value as $a_key => $a_val) {
-                                                                ?> 
-                                                                    <tr>
-                                                                        <th>{{ $a_key }}</th>
-                                                                        <td>{{ $a_val }}</td>
-                                                                    </tr>     
-                                                                <?php
-                                                                    }
-                                                                ?>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                            <?php
-                                                }
-                                            ?>
-                                        </td>
-                                        <td>
-                                        <?php
-                                                if(count($item->new_value) > 0) {
-                                            ?> 
-                                                    <div class="card">
-                                                        <div class="card-body">
-                                                            <table class="table table-borderless mb-0">
-                                                                <?php
-                                                                    foreach($item->new_value as $a_key => $a_val) {
-                                                                ?> 
-                                                                    <tr>
-                                                                        <th>{{ $a_key }}</th>
-                                                                        <td>{{ $a_val }}</td>
-                                                                    </tr>     
-                                                                <?php
-                                                                    }
-                                                                ?>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                            <?php
-                                                }
-                                            ?>
-                                        </td>
-                                        <td></td>
-                                        <td style="vertical-align: middle;">
-                                            <?= $item->created_at; ?>
-                                        </td>
-                                    </tr>
-                        <?php
-                                }
-                            }
-                        ?>
-
-                    </tbody>
-                </table>
             </div>
-            <span class="pull-left">{{ $data->appends(request()->except('page'))->links() }}</span>
 
+            <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Log Detail</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <style type="text/css">
+                .card .card-body {
+                    padding: 10px;
+                }
+                .detail-info-table tr th,
+                .detail-info-table tr td {
+                    padding: 2px;
+                    border: none;
+                }
+                #detailModal .card-body table tr td,
+                #detailModal .card-body table tr th {
+                    padding: 2px;
+                }
+            </style>
         </div>
     </div>
-</div>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
 
-<style type="text/css">
-    .table-borderless tr {
-        background: none !important;
-    }
-    .table-borderless tr th,
-    .table-borderless tr td {
-        padding-top: 5px !important;
-        padding-bottom: 5px !important;
-    }
-</style>
-@stop
+        $(document).ready(function() {
+            $(document).delegate('.show_detail', 'click', function(e) {
+                e.preventDefault();
+                var url = $(this).attr('data-href');
+
+                $.ajax({
+                    url: url,
+                    type:"GET",
+                    cache: false,
+                    success:function(data){
+                        if(data.status == 'success'){
+                          $('#detailModal .modal-body').html(data.data);
+                          $('#detailModal').modal('show');
+                        }
+                    },
+                });
+            })
+        })
+
+        var table = $('#log-table').DataTable({
+            processing: true,
+            serverSide: true,
+            order: [],
+            lengthMenu: [[5, 10, 20, 50, 75, 100, 200, 500, 1000, -1], [5, 10, 20, 50, 75, 100, 200, 500, 1000, 'All']],
+            pageLength: 10,
+            ajax: {
+                url: "{{ route('changelog.ajaxList') }}",
+                type: "GET",
+                "data": function ( data ) {
+                    data.status = $('#filterByStatus').val();
+                }
+            },
+            globalSearch: true,
+            scrollCollapse: true,
+            columns: [
+                {data: 'id', name: 'id', orderable: true, searchable: true},
+                {data: 'action_type', name: 'action_type', orderable: true, searchable: true},
+                {data: 'table_name', name: 'table_name', orderable: true, searchable: true},
+                {data: 'old_value', name: 'old_value', orderable: false, searchable: true},
+                {data: 'new_value', name: 'new_value', orderable: false, searchable: true},
+                {data: 'created_by', name: 'created_by', orderable: true, searchable: true},
+                {data: 'created_at', name: 'created_at', orderable: true, searchable: true},
+                {data: 'action', name: 'action', orderable: false, searchable: false, className: 'flex text-center action'},
+            ],
+            columnDefs: [{
+                targets: 0,
+                orderable: false,
+                checkboxes: true,
+                className: 'select-checkbox',
+            }],
+            drawCallback:function (x) {
+                // $("#selectAll").prop("checked", false);
+            }
+        });
+
+    </script>
+
+@endsection
