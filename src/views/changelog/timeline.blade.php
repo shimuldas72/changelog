@@ -11,8 +11,7 @@
 						foreach ($items as $key => $item) {
 				?>
 							<li>
-								<h5 class="mb-0">
-									{{ ($item->user)?$item->user->$user_name_column.' ('.$item->created_by.')':$item->created_by }} <span class="action-type">{{ $item->action_type }}d</span> row {{ $item->table_pk_value }}
+								<h5 class="mb-0"><span class="action-type">{{ ucfirst($item->action_type) }}d</span> by {{ ($item->user)?$item->user->$user_name_column.' ('.$item->created_by.')':$item->created_by }}
 								</h5>
 								<p><small>on {{ date('F j, Y h:i:s A', strtotime($item->created_at)) }}</small></p>
 								@if($item->old_value)
