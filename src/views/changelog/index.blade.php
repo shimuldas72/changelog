@@ -81,6 +81,25 @@
               </div>
             </div>
 
+            <div class="modal fade" id="timelineModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Timeline</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <style type="text/css">
                 .card .card-body {
                     padding: 10px;
@@ -93,6 +112,39 @@
                 #detailModal .card-body table tr td,
                 #detailModal .card-body table tr th {
                     padding: 2px;
+                }
+                ul.timeline {
+                    list-style-type: none;
+                    position: relative;
+                }
+                ul.timeline:before {
+                    content: ' ';
+                    background: #d4d9df;
+                    display: inline-block;
+                    position: absolute;
+                    left: 29px;
+                    width: 2px;
+                    height: 100%;
+                    z-index: 400;
+                }
+                ul.timeline > li {
+                    margin: 20px 0;
+                    padding-left: 20px;
+                }
+                ul.timeline > li:before {
+                    content: ' ';
+                    background: white;
+                    display: inline-block;
+                    position: absolute;
+                    border-radius: 50%;
+                    border: 3px solid #22c0e8;
+                    left: 20px;
+                    width: 20px;
+                    height: 20px;
+                    z-index: 400;
+                }
+                ul.timeline .action-type {
+                    color: #f00;
                 }
             </style>
         </div>
@@ -114,6 +166,24 @@
                         if(data.status == 'success'){
                           $('#detailModal .modal-body').html(data.data);
                           $('#detailModal').modal('show');
+                        }
+                    },
+                });
+            })
+
+            $(document).delegate('.show_timeline', 'click', function(e) {
+                e.preventDefault();
+                var url = $(this).attr('data-href');
+
+                $.ajax({
+                    url: url,
+                    type:"GET",
+                    cache: false,
+                    success:function(data){
+                        if(data.status == 'success'){
+                          $('#timelineModal .modal-body').html(data.data);
+                          $('#timelineModal .modal-title').html(data.heading);
+                          $('#timelineModal').modal('show');
                         }
                     },
                 });

@@ -62,4 +62,37 @@ class ChangeLogController extends Controller
             return response()->json($response);
         }
     }
+
+    public function timeline(Request $request, $id) {
+        try{
+            $log = ChangeLog::with('user')->find($id);
+            $data = Changelog::with('user')->where('table_name', $log->table_name)
+                        ->where('table_pk', $log->table_pk)
+                        ->where('table_pk_value', $log->table_pk_value)
+                        ->orderBy('id', 'desc')
+                        ->get();
+
+            $view = \Illuminate\Support\Facades\View::make('changelog::changelog.timeline', [ 
+                'items' => $data, 
+                'log' => $log
+            ]);
+            $contents = $view->render();
+
+            $response = [
+                'status' => 'success',
+                'data' => $contents,
+                'heading' => 'Timeline of '.strtoupper($log->table_name).' table Primary Key - '.$log->table_pk.' = '.$log->table_pk_value
+            ];
+
+            return response()->json($response);
+
+        } catch (\Exception $exception){
+            $response = [
+                'status' => 'error',
+                'data' => $exception->getMessage()
+            ];
+
+            return response()->json($response);
+        }
+    }
 }

@@ -79,3 +79,36 @@
         </tr>
     </tbody>
 </table>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-borderless detail-info-table">
+            <tbody>
+                <tr>
+                    <th style="min-width: 150px;">Controller</th>
+                    <td>: {{ $item->controller }}</td>
+                </tr>
+                <tr>
+                    <th>Route Name</th>
+                    <td>: {{ $item->route_name }}</td>
+                </tr>
+                <tr>
+                    <th>Url</th>
+                    <td>: {{ $item->req_url }}</td>
+                </tr>
+                <tr>
+                    <th>Method</th>
+                    <td>: {{ $item->req_method }}</td>
+                </tr>
+                <tr>
+                    <th>IP</th>
+                    <td>: {{ $item->req_ip }}</td>
+                </tr>
+                <tr>
+                    <th>User Agent</th>
+                    <td>: {{ $item->req_user_agent }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

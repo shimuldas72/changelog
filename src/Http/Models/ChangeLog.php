@@ -15,8 +15,16 @@ class ChangeLog extends Model
   	protected $fillable = [
   		'action_type',
 	    'table_name',
+      'table_pk',
+      'table_pk_value',
 	    'old_value',
 	    'new_value',
+      'controller',
+      'route_name',
+      'req_url',
+      'req_method',
+      'req_ip',
+      'req_user_agent',
 	    'created_by'
   	];
 
@@ -117,6 +125,9 @@ class ChangeLog extends Model
             $nestedData['id'] = $item->id;
             $nestedData['action_type'] = $item->action_type;
             $nestedData['table_name'] = $item->table_name;
+            if($item->table_pk) {
+              $nestedData['table_name'] .= '<br/><a class="btn btn-sm btn-primary show_timeline" data-href="'.route('changelog.timeline', $item->id).'">Timeline of '.strtoupper($item->table_pk).' - '.$item->table_pk_value.'</a>';
+            }
             $nestedData['old_value'] = $old_values;
             $nestedData['new_value'] = $new_values;
             $nestedData['created_by'] = ($item->user)?$item->user->$user_name_column.' ('.$item->created_by.')':$item->created_by;
