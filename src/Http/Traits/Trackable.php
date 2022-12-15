@@ -62,7 +62,7 @@ trait Trackable
             try{
                 $attributes = $model->getAttributes();
                 $primary_key = $model->getKeyName();
-                
+
                 $log = new ChangeLog();
                 $log->action_type = 'delete';
                 $log->table_name = $model->getTable();
@@ -104,7 +104,7 @@ trait Trackable
             foreach ($changed_values as $key => $value) {
                 if(isset($original_values[$key])) {
                     
-                    if($original_values[$key] !== $value || $key == 'id') {
+                    if($original_values[$key] !== $value) {
                         $old[$key] = $original_values[$key];
                         $new[$key] = $changed_values[$key];
                     }
