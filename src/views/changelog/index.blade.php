@@ -46,6 +46,11 @@
                                             <th data-sortable="true" class="">Table</th>
                                             <th data-sortable="true" class="">Old Value</th>
                                             <th data-sortable="true" class="">New Value</th>
+                                            <th data-sortable="true" class="">Tracking</th>
+                                            <th data-sortable="true" class="">Controller</th>
+                                            <th data-sortable="true" class="">Route Name</th>
+                                            <th data-sortable="true" class="">Url</th>
+                                            <th data-sortable="false" class="">Method</th>
                                             <th data-sortable="false" class="">Created By</th>
                                             <th data-sortable="false" class="">Time</th>
                                             <th data-sortable="false" class=" text-center">Action</th>
@@ -211,16 +216,19 @@
                 {data: 'table_name', name: 'table_name', orderable: true, searchable: true},
                 {data: 'old_value', name: 'old_value', orderable: false, searchable: true},
                 {data: 'new_value', name: 'new_value', orderable: false, searchable: true},
-                {data: 'created_by', name: 'created_by', orderable: true, searchable: true},
-                {data: 'created_at', name: 'created_at', orderable: true, searchable: true},
+                {data: 'tracking', name: 'tracking', orderable: false, searchable: false},
+                {data: 'controller', name: 'controller', orderable: false, searchable: true, visible: false},
+                {data: 'route_name', name: 'route_name', orderable: false, searchable: true, visible: false},
+                {data: 'req_url', name: 'req_url', orderable: false, searchable: true, visible: false},
+                {data: 'req_method', name: 'req_method', orderable: false, searchable: true, visible: false},
+                {data: 'created_by', name: 'created_by', orderable: true, searchable: true, visible: false},
+                {data: 'created_at', name: 'created_at', orderable: true, searchable: true, visible: false},
                 {data: 'action', name: 'action', orderable: false, searchable: false, className: 'flex text-center action'},
             ],
-            columnDefs: [{
-                targets: 0,
-                orderable: false,
-                checkboxes: true,
-                className: 'select-checkbox',
-            }],
+            columnDefs: [
+                { "width":"50px", targets: 0, orderable: false, checkboxes: true, className: 'select-checkbox' },
+                
+            ],
             drawCallback:function (x) {
                 // $("#selectAll").prop("checked", false);
             }

@@ -95,4 +95,18 @@ class ChangeLogController extends Controller
             return response()->json($response);
         }
     }
+
+    public function timelineDetails(Request $request, $id) {
+        $log = ChangeLog::with('user')->find($id);
+        $items = Changelog::with('user')->where('table_name', $log->table_name)
+                    ->where('table_pk', $log->table_pk)
+                    ->where('table_pk_value', $log->table_pk_value)
+                    ->orderBy('id', 'desc')
+                    ->get();
+
+        return view('changelog::changelog.timeline-details', [
+            'log' => $log,
+            'items' => $items
+        ]);
+    }
 }

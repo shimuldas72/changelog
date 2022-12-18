@@ -63,22 +63,27 @@ class ChangeLog extends Model
   public function getLogList(
       $request=[],
       $params=[],
-      $columns = ['*'],
+      $columns = ['change_log.*'],
       $withTrashed = false,
       $onlyDeleted = false
   )
   {
+      $classs = Config::get('changelog')['userClass'];
+      $name_column = Config::get('changelog')['name_column'];
+      $user_class = new $classs;
+      $tbl_name = $user_class->getTable();
 
       if ($request->input('order')) {
           $col = $request->input('order.0.column');
           $order = $request->input('columns.' . (int)$col . '.data');
+          $order = 'change_log.'.$order;
           $dir = $request->input('order.0.dir');
       } else {
-          $order = 'id';
+          $order = 'change_log.id';
           $dir = 'desc';
       }
 
-      $query = self::select($columns)->orderBy($order, $dir);
+      $query = self::leftJoin($tbl_name,$tbl_name.'.id','=',$this->table.'.created_by')->select($columns)->orderBy($order, $dir);
       $totalData = $query->count();
 
       if ($request->search && $request->search['value'] != "") {
@@ -86,9 +91,21 @@ class ChangeLog extends Model
 
           foreach ($request->input('columns') as $val) {
               if ($val['searchable'] == "false") continue;
-              $query->orWhereRaw('lower(' . $val['data'] . ') like (?)', '%' . strtolower($keyword) . '%');
+              if(in_array($val['data'], ['id', 'created_at'])) {
+                $val['data'] = 'change_log.'.$val['data'];
+              }
+
+              if($val['name'] == 'created_by') {
+
+                $query->orWhereRaw('lower(' . $name_column . ') like (?)', '%' . strtolower($keyword) . '%');
+              } else {
+                $query->orWhereRaw('lower(' . $val['data'] . ') like (?)', '%' . strtolower($keyword) . '%');
+              }
           }
       }
+      // var_dump($query->toSql());
+      // exit();
+
       //if(!empty($params)) $query = $query->ofFilter(isset($params['filters']) ? $params['filters'] : null);
 
       $totalFiltered = $query->count();
@@ -116,9 +133,11 @@ class ChangeLog extends Model
           foreach ($items as $key => $item) {
             $user_name_column = Config::get('changelog')['name_column'];
 
-            $old_values = \Illuminate\Support\Facades\View::make('changelog::changelog._old_value', [ 'item' => $item ])->render();
-            //$old_values = $view->render();
-            $new_values = \Illuminate\Support\Facades\View::make('changelog::changelog._new_value', [ 'item' => $item ])->render();
+            // $old_values = \Illuminate\Support\Facades\View::make('changelog::changelog._old_value', [ 'item' => $item ])->render();
+            // //$old_values = $view->render();
+            //$new_values = \Illuminate\Support\Facades\View::make('changelog::changelog._new_value', [ 'item' => $item ])->render();
+            $old_values = self::getTableOldNewValue($item->old_value);
+            $new_values = self::getTableOldNewValue($item->new_value);
 
 
             $nestedData['key'] = $key + 1;
@@ -126,12 +145,24 @@ class ChangeLog extends Model
             $nestedData['action_type'] = $item->action_type;
             $nestedData['table_name'] = $item->table_name;
             if($item->table_pk) {
-              $nestedData['table_name'] .= '<br/><a class="btn btn-sm btn-primary show_timeline" data-href="'.route('changelog.timeline', $item->id).'">Timeline of '.strtoupper($item->table_pk).' - '.$item->table_pk_value.'</a>';
+              $nestedData['table_name'] .= '<br/><a class="btn btn-sm btn-primary show_timeline" data-href="'.route('changelog.timeline', $item->id).'">Timeline of '.strtoupper($item->table_pk).' -'.$item->table_pk_value.'</a>';
             }
+
             $nestedData['old_value'] = $old_values;
             $nestedData['new_value'] = $new_values;
+
+            $nestedData['tracking'] = '<strong>Url</strong>: ('.$item->req_method.') '.$item->req_url;
+
+            $nestedData['controller'] = $item->controller.'<br>'.$item->route_name;
+            $nestedData['route_name'] = $item->route_name;
+            $nestedData['req_url'] = $item->req_url.'<br/>'.$item->req_method;
+            $nestedData['req_method'] = $item->req_method;
             $nestedData['created_by'] = ($item->user)?$item->user->$user_name_column.' ('.$item->created_by.')':$item->created_by;
             $nestedData['created_at'] = date('d-M-y h:i:s A', strtotime($item->created_at));
+
+
+            $nestedData['tracking'] .= '<br/><strong>Created By: </strong>'.$nestedData['created_by'];
+            $nestedData['tracking'] .= '<br/><strong>Created At: </strong>'.$nestedData['created_at'];
 
             $nestedData['action'] = '';
             $nestedData['action'] .= '<a title="View" href="" data-href="'.route('changelog.detail', $item->id).'" class="btn-sm btn btn-info btn-detail show_detail" style="display: inline-block !important">Details</a>';
@@ -144,4 +175,29 @@ class ChangeLog extends Model
           var_dump($exception->getMessage());
       }
   }
+
+  public static function getTableOldNewValue($value) {
+
+    if($value){
+      
+      $str = '';
+      $i = 0;
+      if(count($value) > 0) {
+        foreach ($value as $akey => $aval) {
+          $i++;
+
+          if($i > 1){
+            $str .= '<br/>';
+          }
+          $str .= '<strong>'.$akey.'</strong>'.': '.$aval;
+        }
+      } 
+    
+      return '<p style="background: #fff; border: 1px solid #ccc; border-radius: 5px; padding: 5px 10px;">'.$str.'</p>';
+    }
+      
+    return '';
+  }
+
+
 }
