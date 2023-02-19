@@ -22,15 +22,11 @@
 										if(count($item->old_value) > 0) {
 											foreach ($item->old_value as $akey => $aval) {
 												$i++;
-
-												if($i > 1){
-													$str .= ', ';
-												}
-												$str .= '<strong>'.$akey.'</strong>'.': '.$aval;
+												$str .= '<div><strong>'.$akey.'</strong>'.': '.$aval.'</div>';
 											}
 										} 
 									?>
-									<p style="border: 1px solid #ccc; border-radius: 5px; padding: 5px 10px;"><?= $str; ?></p>
+									<div style="border: 1px solid #ccc; border-radius: 5px; padding: 5px 10px; margin-bottom: 15px;"><?= $str; ?></div>
 								@endif
 
 								@if($item->new_value)
@@ -44,11 +40,11 @@
 												if($i > 1){
 													$str .= ', ';
 												}
-												$str .= '<strong>'.$akey.'</strong>'.': '.$aval;
+												$str .= '<div><strong>'.$akey.'</strong>'.': '.$aval.'</div>';
 											}
 										} 
 									?>
-									<p style="border: 1px solid #ccc; border-radius: 5px; padding: 5px 10px;"><?= $str; ?></p>
+									<div style="border: 1px solid #ccc; border-radius: 5px; padding: 5px 10px;"><?= $str; ?></div>
 								@endif
 
 							</li>

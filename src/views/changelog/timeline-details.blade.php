@@ -84,7 +84,7 @@
                                                                 ?> 
                                                                     <tr>
                                                                         <th>{{ $a_key }}</th>
-                                                                        <td>{{ $a_val }}</td>
+                                                                        <td>{!! $a_val !!}</td>
                                                                     </tr>     
                                                                 <?php
                                                                     }
@@ -108,7 +108,7 @@
                                                                 ?> 
                                                                     <tr>
                                                                         <th>{{ $a_key }}</th>
-                                                                        <td>{{ $a_val }}</td>
+                                                                        <td>{!! $a_val !!}</td>
                                                                     </tr>     
                                                                 <?php
                                                                     }

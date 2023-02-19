@@ -193,7 +193,7 @@ class ChangeLog extends Model
         }
       } 
     
-      return '<p style="background: #fff; border: 1px solid #ccc; border-radius: 5px; padding: 5px 10px;">'.$str.'</p>';
+      return '<div style="max-width: 50vw; overflow: auto; background: #fff; border: 1px solid #ccc; border-radius: 5px; padding: 5px 10px;">'.$str.'</div>';
     }
       
     return '';
